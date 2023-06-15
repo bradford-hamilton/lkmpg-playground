@@ -1,12 +1,11 @@
 // The simplest kernel module
 
 #include <linux/module.h> // Needed by all modules
-#include <linux/printkh> // Needed for pr_info()
+#include <linux/printk.h> // Needed for pr_info()
 
 int init_module(void)
 {
-  pr_info("Hello 1.\n");
-
+  pr_info("Hello 1\n");
   return 0;
 }
 
