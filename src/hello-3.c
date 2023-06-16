@@ -1,4 +1,4 @@
-// Adding example using __init_data macro
+// Example using __init_data macro
 
 #include <linux/init.h> // Needed for the macros
 #include <linux/module.h> // Needed by all modules
