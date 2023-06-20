@@ -55,7 +55,7 @@ static struct file_operations chardev_fops = {
 static int __init chardev_init(void)
 {
   major = register_chrdev(0, DEVICE_NAME, &chardev_fops);
-  
+
   if (major < 0) {
     pr_alert("Registering char device failed with %d\n", major);
     return major;
