@@ -1,1 +1,1 @@
-###### Going through [The Linux Kernel Module Programming Guide](https://github.com/sysprog21/lkmpg)
+###### Going through [The Linux Kernel Module Programming Guide](https://github.com/sysprog21/lkmpg) as well as [Linux Device Driver Programming](https://www.udemy.com/course/linux-device-driver-programming-using-beaglebone-black).
