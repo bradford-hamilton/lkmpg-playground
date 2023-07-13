@@ -135,6 +135,9 @@ static int pcd_platform_driver_probe(struct platform_device* pdev)
   dev_data->pdata.perm = pdata->perm;
   dev_data->pdata.serial_num = pdata->serial_num;
 
+  // Save the device private data pointer in platform device structure
+  dev_set_drvdata(pdev->dev, dev_data);
+
   pr_info("Device serial number = %s\n", dev_data->pdata.serial_num);
   pr_info("Device size = %d\n", dev_data->pdata.size);
   pr_info("Device permission = %d\n", dev_data->pdata.perm);
@@ -169,6 +172,8 @@ static int pcd_platform_driver_probe(struct platform_device* pdev)
     goto cdev_del;
   }
 
+  pcdrv_data.total_devices++;
+
   pr_info("The probe was successful\n");
 
   return 0;
@@ -187,7 +192,15 @@ out:
 // Called when the device is removed from the system
 static int pcd_platform_driver_remove(struct platform_device* pdev)
 {
+  struct pcdev_private_data* dev_data = dev_get_drvdata(&pdev->dev);
+  device_destroy(pcdrv_data.pcd_class, dev_data->device_num);
+  cdev_del(&dev_data->cdev);
+  kfree(dev_data->buf);
+  kfree(dev_data);
+  pcdrv_data.total_devices--;
+
   pr_info("Device removed\n");
+
   return 0;
 }
 
