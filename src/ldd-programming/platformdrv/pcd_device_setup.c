@@ -7,7 +7,7 @@
 
 static void pcdev_release(void);
 
-struct pcdev_platform_data pcdev_pltfrm_data[2] = {
+struct pcdev_platform_data pcdev_pltfrm_data[4] = {
   [0]: {
     .size = 512,
     .perm = RDWR,
@@ -16,7 +16,17 @@ struct pcdev_platform_data pcdev_pltfrm_data[2] = {
   [1]: {
     .size = 1024,
     .perm = RDWR,
-    .serial_num = "pcdevxyz2023",
+    .serial_num = "pcdevdef2023",
+  },
+  [2]: {
+    .size = 128,
+    .perm = RDONLY,
+    .serial_num = "pcdevghi2023",
+  },
+  [3]: {
+    .size = 32,
+    .perm = WRONLY,
+    .serial_num = "pcdevjkl2023",
   },
 };
 
@@ -38,6 +48,31 @@ struct platform_device platform_pcdev_2 = {
   },
 };
 
+struct platform_device platform_pcdev_3 = {
+  .name = "pseudo-char-device",
+  .id = 2,
+  .dev {
+    .platform_data = &pcdev_platform_data[2],
+    .release = pcdev_release,
+  },
+};
+
+struct platform_device platform_pcdev_4 = {
+  .name = "pseudo-char-device",
+  .id = 3,
+  .dev {
+    .platform_data = &pcdev_platform_data[3],
+    .release = pcdev_release,
+  },
+};
+
+struct platform_device* platform_pcdevs[] = {
+  &platform_pcdev_1,
+  &platform_pcdev_2,
+  &platform_pcdev_3,
+  &platform_pcdev_4,
+}
+
 static void pcdev_release(void)
 {
   pr_info("Device released\n");
@@ -45,8 +80,7 @@ static void pcdev_release(void)
 
 static int __init platform_pcdev_init(void)
 {
-  platform_device_register(&platform_pcdev_1);
-  platform_device_register(&platform_pcdev_2);
+  platform_add_devices(platform_pcdevs, ARRAY_SIZE(platform_pcdevs));
 
   pr_info("Device setup module loaded\n");
 
@@ -57,6 +91,8 @@ static void __exit platform_pcdev_exit(void)
 {
   platform_device_unregister(&platform_pcdev_1);
   platform_device_unregister(&platform_pcdev_2);
+  platform_device_unregister(&platform_pcdev_3);
+  platform_device_unregister(&platform_pcdev_4);
 
   pr_info("Device setup module unloaded\n");
 }
