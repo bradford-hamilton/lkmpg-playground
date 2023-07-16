@@ -63,10 +63,10 @@ struct device_config pcdev_config[] = {
 };
 
 static const struct platform_device_id pcdevs_ids[] = {
-  [0] = { .name = "pcdev-A1x", driver_data = PCDEVA1X },
-  [1] = { .name = "pcdev-B1x", driver_data = PCDEVB1X },
-  [2] = { .name = "pcdev-C1x", driver_data = PCDEVC1X },
-  [3] = { .name = "pcdev-D1x", driver_data = PCDEVD1X },
+  [0] = { .name = "pcdev-A1x", .driver_data = PCDEVA1X },
+  [1] = { .name = "pcdev-B1x", .driver_data = PCDEVB1X },
+  [2] = { .name = "pcdev-C1x", .driver_data = PCDEVC1X },
+  [3] = { .name = "pcdev-D1x", .driver_data = PCDEVD1X },
 };
 
 static const struct platform_driver pcd_platform_driver = {
