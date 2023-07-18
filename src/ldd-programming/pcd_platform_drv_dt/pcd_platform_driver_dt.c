@@ -84,7 +84,7 @@ static const struct platform_driver pcd_platform_driver = {
   .id_table = pcdevs_ids,
   .driver = {
     .name = "pseudo-char-device",
-    .of_match_table = org_pcdev_dt_match,
+    .of_match_table = of_match_ptr(org_pcdev_dt_match),
   },
 };
 
@@ -198,24 +198,27 @@ static int pcd_platform_driver_probe(struct platform_device* pdev)
   struct pcdev_private_data* dev_data;
   struct pcdev_platform_data* pdata;
   int driver_data;
+  const struct of_device_id* match;
 
   dev_info(dev, "A device is detected\n");
 
-  pdata = pcdev_get_platdata_from_dt(dev);
-  if (IS_ERR(pdata)) {
-    return -EINVAL;
+  // match will always be NULL if linux doesn't support device tree (CONFIG_OF is off)
+  match = of_match_device(of_match_ptr(org_pcdev_dt_match), dev);
+  if (match) {
+    // Device instantiation happened because of device tree node
+    pdata = pcdev_get_platdata_from_dt(dev);
+    if (IS_ERR(pdata)) {
+      return PTR_ERR(pdata);
+    }
+    driver_data = (int)match->data;
+  } else {
+    pdata = (struct pcdev_platform_data*)dev_get_platdata(dev);
+    driver_data = pdev->id_entry->driver_data;
   }
 
   if (!pdata) {
-    // No device tree instantiation, so check instantiation from device setup code
-    pdata = (struct pcdev_platform_data*)dev_get_platdata(dev);
-    if (!pdata) {
-      dev_info(dev, "No platform data available\n");
-      return -EINVAL;
-    }
-    driver_data = pdev->id_entry->driver_data;
-  } else {
-    driver_data = (int)of_device_get_match_data(&pdev->data);
+    dev_info(dev, "No platform data available\n");
+    return -EINVAL;
   }
 
   // Dynamically allocate memory for the device private data
