@@ -248,7 +248,7 @@ static int pcd_platform_driver_probe(struct platform_device* pdev)
   }
 
   // Get the device number
-  dev_data->device_num = pcdrv_data.device_num_base + pdev->id;
+  dev_data->device_num = pcdrv_data.device_num_base + pcdrv_data.total_devices;
   
   // Do cdev init and cdev add
   cdev_init(&dev_data->chdev, &pcd_fops);
@@ -261,7 +261,7 @@ static int pcd_platform_driver_probe(struct platform_device* pdev)
   }
 
   // Create device file for the detected platform device
-  pcdrv_data.pcd_device = device_create(pcdrv_data.pcd_class, NULL, dev_data->device_num, NULL, "pcdev-%d", pdev->id);
+  pcdrv_data.pcd_device = device_create(pcdrv_data.pcd_class, dev, dev_data->device_num, NULL, "pcdev-%d", pcdrv_data.total_devices);
   if (IS_ERR(pcdrv_data.pcd_dev)) {
     dev_err(dev, "Device create failed\n");
     ret = PTR_ERR(pcdrv_data.pcd_dev);
