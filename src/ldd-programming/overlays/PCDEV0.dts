@@ -1,0 +1,27 @@
+// dtc -@ -I dts -O dtb -o PCDEV0.dtbo PCDEV0.dts0
+// Goes in /lib/firmware
+
+/dts-v1/;
+/plugin/;
+
+/ {
+  fragment@0 {
+    target = <&pcdev1>;
+    __OVERLAY__ {
+      status = "disabled";
+    };
+  };
+  fragment@1 {
+    target = <&pcdev2>;
+    __OVERLAY__ {
+      status = "disabled";
+    };
+  };
+  fragment@2 {
+    target = <&pcdev3>;
+    __OVERLAY__ {
+      org,size = <1048>;
+      org,device-serial-num = "PCDEVXXXXXX";
+    };
+  };
+};

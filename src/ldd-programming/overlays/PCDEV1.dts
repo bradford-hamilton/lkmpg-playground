@@ -1,0 +1,14 @@
+// dtc -@ -I dts -O dtb -o PCDEV1.dtbo PCDEV1.dts0
+// Goes in /lib/firmware
+
+/dts-v1/;
+/plugin/;
+
+/ {
+  fragment@0 {
+    target = <&pcdev3>;
+    __OVERLAY__ {
+      status = "disabled";
+    };
+  };
+};
