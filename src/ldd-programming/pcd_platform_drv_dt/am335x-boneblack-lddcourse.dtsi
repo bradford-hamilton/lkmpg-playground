@@ -2,28 +2,28 @@
 // make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- am335x-boneblack.dtb
 
 / {
-  pcdev-1 {
+  pcdev1: pcdev-1 {
     compatible = "pcdev-E1x", "pcdev-A1x";
     org,size = <512>;
-    org,device-serial-num = "PCDEV1ABC123";
+    org,device-serial-num = "PCDEVABC123";
     org,perm = <0x11>;
   };
-  pcdev-2 {
+  pcdev2: pcdev-2 {
     compatible = "pcdev-B1x";
     org,size = <1024>;
-    org,device-serial-num = "PCDEV1ABC456";
+    org,device-serial-num = "PCDEVABC456";
     org,perm = <0x11>;
   };
-  pcdev-3 {
+  pcdev3: pcdev-3 {
     compatible = "pcdev-C1x";
     org,size = <256>;
-    org,device-serial-num = "PCDEV1ABC789";
+    org,device-serial-num = "PCDEVABC789";
     org,perm = <0x11>;
   };
-  pcdev-4 {
+  pcdev4: pcdev-4 {
     compatible = "pcdev-D1x";
     org,size = <2048>;
-    org,device-serial-num = "PCDEV1ABC000";
+    org,device-serial-num = "PCDEVABC000";
     org,perm = <0x11>;
   };
 };
