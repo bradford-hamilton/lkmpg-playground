@@ -102,11 +102,11 @@ static int check_permission(int dev_perm, int access_mode)
     return 0;
   }
   // Read only
-  if ((dev_perm == RDONLY) && ((acccess_mode & FMODE_READ) && !(access_mode & FMODE_WRITE))) {
+  if ((dev_perm == RDONLY) && ((access_mode & FMODE_READ) && !(access_mode & FMODE_WRITE))) {
     return 0;
   }
   // Write only
-  if ((dev_perm == WRONLY) && ((acccess_mode & FMODE_WRITE) && !(access_mode & FMODE_READ))) {
+  if ((dev_perm == WRONLY) && ((access_mode & FMODE_WRITE) && !(access_mode & FMODE_READ))) {
     return 0;
   }
 
