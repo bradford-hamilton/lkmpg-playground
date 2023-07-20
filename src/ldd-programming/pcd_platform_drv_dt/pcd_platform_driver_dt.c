@@ -322,5 +322,5 @@ module_exit(pcd_platform_driver_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("udemy ldd programming");
-MODULE_DESCRIPTION("psuedo character platform driver handling n devices");
+MODULE_DESCRIPTION("psuedo character platform driver handling n devices through device tree");
 MODULE_VERSION("1.0");
