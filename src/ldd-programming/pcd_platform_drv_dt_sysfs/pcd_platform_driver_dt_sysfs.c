@@ -87,6 +87,16 @@ ssize_t show_serial_num(struct device* dev, struct device_attribute* attr, char*
 static DEVICE_ATTR(max_size, S_IRUGO|S_IWUSR, show_max_size, store_max_size);
 static DEVICE_ATTR(serial_num, S_IRUGO, show_serial_num, NULL);
 
+struct attribute* pcd_attrs[] = {
+  &dev_attr_max_size.attr,
+  &dev_attr_serial_number.attr,
+  NULL,
+};
+
+struct attribute_group pcd_attr_group = {
+  .attrs = pcd_attrs,
+};
+
 static int __init pcd_platform_driver_init(void)
 {
   int ret;
@@ -157,13 +167,8 @@ static pcdev_platform_data* pcdev_get_platdata_from_dt(struct device* dev)
 static int pcd_sysfs_create_files(struct device* pcd_dev)
 {
   int ret;
-
-  ret = sysfs_create_file(&pcd_dev->kobj, &dev_attr_max_size.attr);
-  if (ret) {
-    return ret;
-  }
   
-  return sysfs_create_file(&pcd_dev->kobj, &dev_attr_serial_num.attr);
+  return sysfs_create_group(&pcd_dev->kobj, &pcd_attr_group);
 }
 
 // Called when matched platform device is found
