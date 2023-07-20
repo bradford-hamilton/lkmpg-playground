@@ -55,23 +55,37 @@ static const struct platform_driver pcd_platform_driver = {
 
 struct pcdrv_private_data pcdrv_data;
 
-ssize_t max_size_show(struct device* dev, struct device_attribute* attr, char* buf)
+ssize_t show_max_size(struct device* dev, struct device_attribute* attr, char* buf)
 {
-  return 0;
+  struct pcdev_private_data* dev_data = dev_get_drvdata(dev->parent);
+  return sprintf(buf, "%d\n", dev_data->pdata.size);
 }
 
-ssize_t max_size_store(struct device* dev, struct device_attribute* attr, const char* buf, size_t count)
+ssize_t store_max_size(struct device* dev, struct device_attribute* attr, const char* buf, size_t count)
 {
-  return 0;
+  long result;
+  int ret;
+  struct pcdev_private_data* dev_data = dev_get_drvdata(dev->parent);
+
+  ret = kstrtol(buf, 10, &result);
+  if (ret) {
+    return ret;
+  }
+
+  dev_data->pdata.size = result;
+  dev_data->buffer = krealloc(dev_data->buf, dev_data->pdata.size, GFP_KERNEL);
+
+  return count;
 }
 
-ssize_t serial_num_show(struct device* dev, struct device_attribute* attr, char* buf)
+ssize_t show_serial_num(struct device* dev, struct device_attribute* attr, char* buf)
 {
-  return 0;
+  struct pcdev_private_data* dev_data = dev_get_drvdata(dev->parent);
+  return sprintf(buf, "%s\n", dev_data->pdata.serial_num);
 }
 
-static DEVICE_ATTR(max_size, S_IRUGO|S_IWUSR, max_size_show, max_size_store);
-static DEVICE_ATTR(serial_num, S_IRUGO, serial_num_show, NULL);
+static DEVICE_ATTR(max_size, S_IRUGO|S_IWUSR, show_max_size, store_max_size);
+static DEVICE_ATTR(serial_num, S_IRUGO, show_serial_num, NULL);
 
 static int __init pcd_platform_driver_init(void)
 {
