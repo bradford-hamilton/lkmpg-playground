@@ -43,7 +43,7 @@ enum pcdev_names {
   PCDEVB1X,
   PCDEVC1X,
   PCDEVD1X,
-}
+};
 
 struct device_config pcdev_config[] = {
   [PCDEVA1X] = {
