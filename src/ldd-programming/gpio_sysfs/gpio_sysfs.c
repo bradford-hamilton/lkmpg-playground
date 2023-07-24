@@ -37,6 +37,31 @@ struct of_device_id gpio_device_match[] = {
 
 static int gpio_sysfs_probe(struct platform_device* pdev)
 {
+  struct device* dev = &pdev->dev;
+  struct device_node* parent = pdev->dev.of_node;
+  struct device_node* child = NULL;
+  struct gpiodev_private_data* dev_data;
+  const char* name;
+  int i = 0;
+
+  for_each_available_child_of_node(parent, child) {
+    dev_data = devm_kzalloc(dev, sizeof(*dev_data), GFP_KERNEL);
+    if (!dev_data) {
+      dev_err(dev, "Cannot allocate memory\n");
+      return -ENOMEM;
+    }
+
+    if (of_property_read_string(child, "label", &name)) {
+      dev_warn(dev, "Missing label information\n");
+      snprintf(dev_data->label, sizeof(dev_data->label), "unkngpio%d", i);
+    } else {
+      strcpy(dev_data->label, name);
+      dev_info(dev, "GPIO label = %s\n", dev_data->label);
+    }
+  }
+
+  i++;
+
   return 0;
 }
 
@@ -45,7 +70,7 @@ static int gpio_sysfs_remove(struct platform_device* pdev)
   return 0;
 }
 
-struct platform_driver gpio_sysfs_platform_driver {
+const static struct platform_driver gpio_sysfs_platform_driver {
   .probe = gpio_sysfs_probe,
   .remove = gpio_sysfs_remove,
   .driver = {
