@@ -26,4 +26,28 @@
     org,device-serial-num = "PCDEVABC000";
     org,perm = <0x11>;
   };
+
+  bone_gpio_devs {
+    compatible = "org,bone-gpio-sysfs";
+    gpio1 {
+      label = "gpio2.2";
+      bone-gpios = <&gpio2 2 GPIO_ACTIVE_HIGH>;
+    };
+    gpio2 {
+      label = "gpio2.3";
+      bone-gpios = <&gpio2 3 GPIO_ACTIVE_HIGH>;
+    };
+    gpio3 {
+      label = "gpio2.4";
+      bone-gpios = <&gpio2 4 GPIO_ACTIVE_HIGH>;
+    };
+    gpio4 {
+      label = "userled0:gpio1.21";
+      bone-gpios = <&gpio1 21 GPIO_ACTIVE_HIGH>;
+    };
+    gpio5 {
+      label = "userled1:gpio2.22";
+      bone-gpios = <&gpio2 22 GPIO_ACTIVE_HIGH>;
+    };
+  };
 };
