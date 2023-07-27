@@ -9,6 +9,7 @@
 #include <linux/mod_devicetable.h>
 #include <linux/of.h>
 #include <linux/of_device.h>
+#include <linux/gpio/consumer.h>
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("udemy ldd programming");
@@ -21,6 +22,7 @@ MODULE_VERSION("1.0");
 
 static struct gpiodev_private_data {
   char label[20];
+  struct gpio_desc* desc;
 };
 
 static struct gpiodrv_private_data {
@@ -35,8 +37,38 @@ struct of_device_id gpio_device_match[] = {
   {},
 };
 
+ssize_t direction_show(struct device* dev, struct device_attribute* attr, char* buf)
+{
+  return 0;
+}
+
+ssize_t direction_store(struct device* dev, struct device_attribute* attr, const char* buf, size_t count)
+{
+  return 0;
+}
+
+ssize_t value_show(struct device* dev, struct device_attribute* attr, char* buf)
+{
+  return 0;
+}
+
+ssize_t value_store(struct device* dev, struct device_attribute* attr, const char* buf, size_t count)
+{
+  return 0;
+}
+
+ssize_t label_show(struct device* dev, struct device_attribute* attr, char* buf)
+{
+  return 0;
+}
+
+static DEVICE_ATTR_RW(direction);
+static DEVICE_ATTR_RW(value);
+static DEVICE_ATTR_RO(label);
+
 static int gpio_sysfs_probe(struct platform_device* pdev)
 {
+  int ret;
   struct device* dev = &pdev->dev;
   struct device_node* parent = pdev->dev.of_node;
   struct device_node* child = NULL;
@@ -58,6 +90,23 @@ static int gpio_sysfs_probe(struct platform_device* pdev)
       strcpy(dev_data->label, name);
       dev_info(dev, "GPIO label = %s\n", dev_data->label);
     }
+  }
+
+  dev_data->desc = devm_fwnode_get_gpiod_from_child(dev, "bone", child->fwnode, GPIOD_ASIS, dev_data->label);
+  if (IS_ERR(dev_data->desc)) {
+    ret = PTR_ERR(dev_data->desc);
+    if (ret == -ENOENT) {
+      dev_err("No gpio has been assigned to the requested function and/or index\n");
+    }
+    return ret;
+  }
+
+  // Takes into account ACTIVE_LOW/HIGH, so writing 1 to this func will always set
+  // the gpio to "active" regardless of whether it's active when it's high or low.
+  gpiod_direction_output(dev_data->desc, 0);
+  if (ret) {
+    dev_err("gpio direction set failed\n");
+    return ret;
   }
 
   i++;
