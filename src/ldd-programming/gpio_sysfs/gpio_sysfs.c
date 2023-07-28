@@ -66,6 +66,22 @@ static DEVICE_ATTR_RW(direction);
 static DEVICE_ATTR_RW(value);
 static DEVICE_ATTR_RO(label);
 
+static struct attribute* gpio_attrs[] = {
+  &dev_attr_direction.attr,
+  &dev_attr_value.attr,
+  &dev_attr_label.attr,
+  NULL,
+};
+
+static struct attribute_group gpio_attr_group = {
+  .attr = gpio_attrs,
+};
+
+static struct attribute_group* gpio_attr_groups[] = {
+  &gpio_attr_group,
+  NULL,
+};
+
 static int gpio_sysfs_probe(struct platform_device* pdev)
 {
   int ret;
@@ -73,6 +89,7 @@ static int gpio_sysfs_probe(struct platform_device* pdev)
   struct device_node* parent = pdev->dev.of_node;
   struct device_node* child = NULL;
   struct gpiodev_private_data* dev_data;
+  struct device* dev_sysfs;
   const char* name;
   int i = 0;
 
@@ -107,6 +124,12 @@ static int gpio_sysfs_probe(struct platform_device* pdev)
   if (ret) {
     dev_err("gpio direction set failed\n");
     return ret;
+  }
+
+  dev_sysfs = device_create_with_groups(gpio_drv_data.class_gpio, dev, 0, dev_data, gpio_attr_groups, dev_data->label);
+  if (IS_ERR(dev_sysfs)) {
+    dev_err("Error during device_create\n");
+    return PTR_ERR(dev_sysfs);
   }
 
   i++;
