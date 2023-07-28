@@ -225,3 +225,6 @@ static void __exit gpio_sysfs_exit(void)
   platform_driver_unregister(&gpio_sysfs_platform_driver);
   class_destroy(gpio_drv_data.class_gpio);
 }
+
+module_init(gpio_sysfs_init);
+module_exit(gpio_sysfs_exit);
