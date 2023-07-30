@@ -8,8 +8,8 @@
     pinctrl-0 = <&p8_gpios>;
 
     gpio1 {
-      label = "gpio2.6";
-      bone-gpios = <&gpio2 6 GPIO_ACTIVE_HIGH>;
+      label = "gpio2.2";
+      bone-gpios = <&gpio2 2 GPIO_ACTIVE_HIGH>;
     };
     gpio2 {
       label = "gpio2.7";
@@ -55,7 +55,7 @@
 &am33xx_pinmux {
   p8_gpios: bone_p8_gpios {
     pinctrl-single,pins = <
-      AM33XX_PADCONF(AM335X_PIN_LCD_DATA0, PIN_OUTPUT, MUX_MODE7)
+      AM33XX_PADCONF(AM335X_PIN_GPMC_ADVN_ALE, PIN_OUTPUT, MUX_MODE7)
       AM33XX_PADCONF(AM335X_PIN_LCD_DATA1, PIN_OUTPUT, MUX_MODE7)
       AM33XX_PADCONF(AM335X_PIN_LCD_DATA2, PIN_OUTPUT, MUX_MODE7)
       AM33XX_PADCONF(AM335X_PIN_LCD_DATA3, PIN_OUTPUT, MUX_MODE7)
