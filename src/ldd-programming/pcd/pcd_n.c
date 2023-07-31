@@ -32,6 +32,7 @@ static const struct pcdevice_priv_data {
   const char *serial_num;
   int perm;
   struct cdev pcd_cdev;
+  struct mutex pcdev_lock;
 };
 
 // Driver's private data structure
@@ -113,6 +114,8 @@ static int __init pcd_init(void)
       MAJOR(pcdrv_data.device_num + i),
       MINOR(pcdrv_data.device_num + i),
     );
+
+    mutex_init(&pcdrv_data.pcdevice_data[i].pcdev_lock);
 
     // Initialize cdev structure with fops
     cdev_init(&pcdrv_data.pcdevice_data[i].cdev, &pcd_fops);
@@ -208,6 +211,8 @@ static loff_t pcd_lseek(struct file* filp, loff_t offset, int whence)
 
 static ssize_t pcd_read(struct file* filp, char __user* buff, size_t count, loff_t* f_pos)
 {
+  mutex_lock(&pcdev_data->pcdev_lock);
+
   pr_info("Read requested for %zu bytes\n", count);
   pr_info("Current file position %lld = \n", *f_pos);
 
@@ -227,6 +232,8 @@ static ssize_t pcd_read(struct file* filp, char __user* buff, size_t count, loff
   pr_info("Number of bytes successfully read = %zu\n", count);
   pr_info("Updated file position %lld = \n", *f_pos);
 
+  mutex_unlock(&pcdev_data->pcdev_lock);
+
   // Number of bytes successfully read
   return count;
 }
@@ -238,6 +245,8 @@ static ssize_t pcd_write(struct file* filp, const char __user* buff, size_t coun
 
   struct pcdevice_priv_data* pcdev_data = (struct pcdevice_priv_data*)filp->private_data;
   int max_size = pcdev_data->size;
+
+  mutex_lock(&pcdev_data->pcdev_lock);
 
   if ((*f_pos + count) > max_size) {
     count = max_size - *f_pos;
@@ -256,6 +265,8 @@ static ssize_t pcd_write(struct file* filp, const char __user* buff, size_t coun
 
   pr_info("Number of bytes successfully written = %zu\n", count);
   pr_info("Updated file position %lld = \n", *f_pos);
+
+  mutex_unlock(&pcdev_data->pcdev_lock);
 
   return count;
 }
@@ -284,8 +295,8 @@ static int pcd_open(struct inode* inod, struct file* filp)
 
   // Get the pcdevice_priv_data structure from the inode
   struct pcdevice_priv_data* pcdev_data;
-  pcdev_data = CONTAINER_OF(inod->i_cdev, struct pcdevice_priv_data, pcd_cdev);
-  
+  pcdev_data = container_of(inod->i_cdev, struct pcdevice_priv_data, pcd_cdev);
+
   // Supply device private data to other methods of the driver
   filp->private_data = pcdev_data;
 

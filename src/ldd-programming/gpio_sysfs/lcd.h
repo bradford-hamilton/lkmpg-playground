@@ -12,16 +12,6 @@
 #define GPIO_LCD_D7 "gpio2.12" // Data line 7
 #endif
 
-#if 0
-#define GPIO_LCD_RS   "gpio2.2"// Register selection (Character vs. Command)
-// #define GPIO_LCD_RW "gpio2.7" // Read/write
-#define GPIO_LCD_EN   "gpio2.3" // Enable
-#define GPIO_LCD_D4   "gpio2.5" // Data line 4
-#define GPIO_LCD_D5   "gpio2.4" // Data line 5
-#define GPIO_LCD_D6   "gpio1.13" // Data line 6
-#define GPIO_LCD_D7   "gpio1.12" // Data line 7
-#endif 
-
 // LCD commands
 #define LCD_CMD_4DL_2N_5X8F 0x28
 #define LCD_CMD_DON_CURON 0x0E

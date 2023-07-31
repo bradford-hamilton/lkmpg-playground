@@ -4,6 +4,7 @@
 #include <linux/device.h>
 #include <linux/kdev_t.h>
 #include <linux/uaccess.h>
+#include <linux/spinlock.h>
 
 // Format every pr_* message with the current running function name
 #undef pr_fmt
@@ -16,6 +17,8 @@ dev_t device_num;
 struct cdev pcd_cdev;
 struct class* pcd_class;
 struct device* pcd_device;
+
+static DEFINE_MUTEX(pcd_lock);
 
 static int pcd_open(struct inode* inod, struct file* filp);
 static int pcd_release(struct inode* inod, struct file* filp);
@@ -135,6 +138,10 @@ static loff_t pcd_lseek(struct file* filp, loff_t offset, int whence)
 
 static ssize_t pcd_read(struct file* filp, char __user* buff, size_t count, loff_t* f_pos)
 {
+  if (mutex_lock_interruptible(&pcd_lock)) {
+    return -EINTR;
+  }
+
   pr_info("Read requested for %zu bytes\n", count);
   pr_info("Current file position %lld = \n", *f_pos);
 
@@ -152,12 +159,18 @@ static ssize_t pcd_read(struct file* filp, char __user* buff, size_t count, loff
   pr_info("Number of bytes successfully read = %zu\n", count);
   pr_info("Updated file position %lld = \n", *f_pos);
 
+  mutex_unlock(&pcd_lock);
+
   // Number of bytes successfully read
   return count;
 }
 
 static ssize_t pcd_write(struct file* filp, const char __user* buff, size_t count, loff_t* f_pos)
 {
+  if (mutex_lock_interruptible(&pcd_lock)) {
+    return -EINTR;
+  }
+
   pr_info("Read requested for %zu bytes\n", count);
   pr_info("Current file position %lld = \n", *f_pos);
 
@@ -178,6 +191,8 @@ static ssize_t pcd_write(struct file* filp, const char __user* buff, size_t coun
 
   pr_info("Number of bytes successfully written = %zu\n", count);
   pr_info("Updated file position %lld = \n", *f_pos);
+
+  mutex_unlock(&pcd_lock);
 
   return count;
 }
