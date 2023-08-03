@@ -2,7 +2,6 @@
 #define LCD_DRIVER_H
 
 // BBB GPIO numbers used to connect with LCD pins
-#if 1
 #define GPIO_LCD_RS "gpio2.2" // Register selection (Character vs. Command)
 #define GPIO_LCD_RW "gpio2.7" // Read/write
 #define GPIO_LCD_EN "gpio2.8" // Enable
@@ -10,7 +9,6 @@
 #define GPIO_LCD_D5 "gpio2.10" // Data line 5
 #define GPIO_LCD_D6 "gpio2.11" // Data line 6
 #define GPIO_LCD_D7 "gpio2.12" // Data line 7
-#endif
 
 // LCD commands
 #define LCD_CMD_4DL_2N_5X8F 0x28
