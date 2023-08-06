@@ -138,7 +138,7 @@ static struct attribute* gpio_attrs[] = {
 };
 
 static struct attribute_group gpio_attr_group = {
-  .attr = gpio_attrs,
+  .attrs = gpio_attrs,
 };
 
 static const struct attribute_group* gpio_attr_groups[] = {
@@ -182,32 +182,32 @@ static int gpio_sysfs_probe(struct platform_device* pdev)
       strcpy(dev_data->label, name);
       dev_info(dev, "GPIO label = %s\n", dev_data->label);
     }
-  }
 
-  dev_data->desc = devm_fwnode_get_gpiod_from_child(dev, "bone", child->fwnode, GPIOD_ASIS, dev_data->label);
-  if (IS_ERR(dev_data->desc)) {
-    ret = PTR_ERR(dev_data->desc);
-    if (ret == -ENOENT) {
-      dev_err("No gpio has been assigned to the requested function and/or index\n");
+    dev_data->desc = devm_fwnode_get_gpiod_from_child(dev, "bone", &child->fwnode, GPIOD_ASIS, dev_data->label);
+    if (IS_ERR(dev_data->desc)) {
+      ret = PTR_ERR(dev_data->desc);
+      if (ret == -ENOENT) {
+        dev_err(dev, "No gpio has been assigned to the requested function and/or index\n");
+      }
+      return ret;
     }
-    return ret;
-  }
 
-  // Takes into account ACTIVE_LOW/HIGH, so writing 1 to this func will always set
-  // the gpio to "active" regardless of whether it's active when it's high or low.
-  gpiod_direction_output(dev_data->desc, 0);
-  if (ret) {
-    dev_err("gpio direction set failed\n");
-    return ret;
-  }
+    // Takes into account ACTIVE_LOW/HIGH, so writing 1 to this func will always set
+    // the gpio to "active" regardless of whether it's active when it's high or low.
+    ret = gpiod_direction_output(dev_data->desc, 0);
+    if (ret) {
+      dev_err(dev, "gpio direction set failed\n");
+      return ret;
+    }
 
-  gpio_drv_data.dev[i] = device_create_with_groups(gpio_drv_data.class_gpio, dev, 0, dev_data, gpio_attr_groups, dev_data->label);
-  if (IS_ERR(gpio_drv_data.dev[i])) {
-    dev_err("Error during device_create\n");
-    return PTR_ERR(gpio_drv_data.dev[i]);
-  }
+    gpio_drv_data.dev[i] = device_create_with_groups(gpio_drv_data.class_gpio, dev, 0, dev_data, gpio_attr_groups, dev_data->label);
+    if (IS_ERR(gpio_drv_data.dev[i])) {
+      dev_err(dev, "Error during device_create\n");
+      return PTR_ERR(gpio_drv_data.dev[i]);
+    }
 
-  i++;
+    i++;
+  }
 
   return 0;
 }
@@ -222,7 +222,7 @@ static int gpio_sysfs_remove(struct platform_device* pdev)
   return 0;
 }
 
-const static struct platform_driver gpio_sysfs_platform_driver {
+const static struct platform_driver gpio_sysfs_platform_driver = {
   .probe = gpio_sysfs_probe,
   .remove = gpio_sysfs_remove,
   .driver = {
