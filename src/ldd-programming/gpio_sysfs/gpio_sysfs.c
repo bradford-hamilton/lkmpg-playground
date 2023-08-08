@@ -46,17 +46,18 @@ ssize_t direction_show(struct device* dev, struct device_attribute* attr, char* 
   int dir;
   char* direction;
 
-  mutex_lock(&dev_data.pcd_lock);
+  mutex_lock(&dev_data->pcd_lock);
 
   dir = gpiod_get_direction(dev_data->desc);
   if (dir < 0) {
+    mutex_unlock(&dev_data->pcd_lock);
     return dir;
   }
 
   direction = (dir == 0) ? "out" : "in";
   ssize_t written = sprintf(buf, "%s\n", direction);
 
-  mutex_unlock(&dev_data.pcd_lock);
+  mutex_unlock(&dev_data->pcd_lock);
 
   return written;
 }
@@ -66,7 +67,7 @@ ssize_t direction_store(struct device* dev, struct device_attribute* attr, const
   struct gpiodev_private_data* dev_data = dev_get_drvdata(dev);
   int ret;
 
-  mutex_lock(&dev_data.pcd_lock);
+  mutex_lock(&dev_data->pcd_lock);
 
   if (sysfs_streq(buf, "in")) {
     ret = gpiod_direction_input(dev_data->desc);
@@ -76,7 +77,7 @@ ssize_t direction_store(struct device* dev, struct device_attribute* attr, const
     ret = -EINVAL;
   }
 
-  mutex_unlock(&dev_data.pcd_lock);
+  mutex_unlock(&dev_data->pcd_lock);
 
   return ret ? ret : count;
 }
@@ -86,12 +87,12 @@ ssize_t value_show(struct device* dev, struct device_attribute* attr, char* buf)
   struct gpiodev_private_data* dev_data = dev_get_drvdata(dev);
   int value;
   
-  mutex_lock(&dev_data.pcd_lock);
+  mutex_lock(&dev_data->pcd_lock);
 
   value = gpiod_get_value(dev_data->desc);
   ssize_t written = sprintf(buf, "%d\n", value);
 
-  mutex_unlock(&dev_data.pcd_lock);
+  mutex_unlock(&dev_data->pcd_lock);
 
   return written;
 }
@@ -102,7 +103,7 @@ ssize_t value_store(struct device* dev, struct device_attribute* attr, const cha
   int ret;
   long value;
 
-  mutex_lock(&dev_data.pcd_lock);
+  mutex_lock(&dev_data->pcd_lock);
 
   ret = kstrtol(buf, 0, &value);
   if (ret) {
@@ -110,7 +111,7 @@ ssize_t value_store(struct device* dev, struct device_attribute* attr, const cha
   }
   gpiod_set_value(dev_data->desc, value);
 
-  mutex_unlock(&dev_data.pcd_lock);
+  mutex_unlock(&dev_data->pcd_lock);
 
   return count;
 }
@@ -119,9 +120,9 @@ ssize_t label_show(struct device* dev, struct device_attribute* attr, char* buf)
 {
   struct gpiodev_private_data* dev_data = dev_get_drvdata(dev);
   
-  mutex_lock(&dev_data.pcd_lock);
+  mutex_lock(&dev_data->pcd_lock);
   ssize_t written = sprintf(buf, "%s\n", dev_data->label);
-  mutex_unlock(&dev_data.pcd_lock);
+  mutex_unlock(&dev_data->pcd_lock);
   
   return written;
 }
